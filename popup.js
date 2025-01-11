@@ -11,7 +11,6 @@ document.getElementById("stop").addEventListener("click", () => {
   chrome.runtime.sendMessage({ action: "stop" });
 });
 
-
 // Get Position web page
 document.getElementById("selectArea").addEventListener("click", (e) => {
   e.stopPropagation();
@@ -29,14 +28,31 @@ function toggleTracking() {
 
   if (window.isTracking) {
     document.addEventListener("click", handleMouseClick);
-  } 
+  }
 
   function handleMouseClick(e) {
     const pageX = e.pageX;
     const pageY = e.pageY;
+
+    chrome.runtime.sendMessage({
+      action: "savePosition",
+      position: { pageX, pageY },
+    });
 
     console.log(`Mouse clicked at X: ${pageX}, Y: ${pageY}`);
     document.removeEventListener("click", handleMouseClick);
     window.isTracking = false;
   }
 }
+
+// user input text sent background
+const contentInput = document.getElementById("userText");
+chrome.runtime.sendMessage({ action: "loadContent" }, (response) => {
+  contentInput.value = response.content;
+});
+
+// get user text if save text storage
+contentInput.addEventListener("input", function () {
+  const content = contentInput.value;
+  chrome.runtime.sendMessage({ action: "saveContent", content });
+});
