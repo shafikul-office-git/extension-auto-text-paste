@@ -20,3 +20,7 @@ chrome.commands.onCommand.addListener((command) => {
     intervalId = null;
   }
 });
+
+chrome.runtime.onInstalled.addListener(() => {
+  console.log("Extension Installed");
+});
