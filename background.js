@@ -1,7 +1,7 @@
 let intervalId = null;
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "start") {
+chrome.commands.onCommand.addListener((command) => {
+  if (command === "start-simulation") {
     if (!intervalId) {
       intervalId = setInterval(() => {
         chrome.tabs.query({ currentWindow: true }, (tabs) => {
@@ -13,9 +13,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             });
           }
         });
-      }, 500); // প্রতি 500ms (অর্ধ সেকেন্ড)
+      }, 500);
     }
-  } else if (message.action === "stop") {
+  } else if (command === "stop-simulation") {
     clearInterval(intervalId);
     intervalId = null;
   }
