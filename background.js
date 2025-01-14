@@ -19,7 +19,7 @@ chrome.commands.onCommand.addListener((command) => {
               chrome.tabs.query({ active: true, currentWindow: true }, (activeTabs) => {
                 const activeTabIndex = tabs.findIndex(tab => tab.id === activeTabs[0].id);
                 const nextTabIndex = (activeTabIndex + 1) % tabs.length;
-
+          
                 chrome.tabs.update(tabs[nextTabIndex].id, { active: true }, () => {
                   chrome.scripting.executeScript({
                     target: { tabId: tabs[nextTabIndex].id },
@@ -27,15 +27,28 @@ chrome.commands.onCommand.addListener((command) => {
                       const element = document.elementFromPoint(position.pageX, position.pageY);
                       if (element) {
                         console.log("Element Found:", element);
-
-                        if (element.tagName === "INPUT" || element.tagName === "TEXTAREA") {
+          
+                        if (element.tagName === "IFRAME") {
+                          try {
+                            const iframeDoc = element.contentDocument || element.contentWindow.document;
+                            iframeDoc.body.innerHTML += "Injected content into iframe body";
+                            // console.log("Content injected into iframe body.");
+                          } catch (err) {
+                            console.log("Cross-origin iframe. Injection failed.");
+                          }
+          
+                        } else if (element.tagName === "INPUT" || element.tagName === "TEXTAREA") {
                           element.value = "Auto-filled text";
                           element.dispatchEvent(new Event('input', { bubbles: true }));
-                          console.log("Text injected in input/textarea.");
+                          // console.log("Text injected in input/textarea.");
+          
+                        } else if (element.tagName === "DIV") {
+                          element.innerHTML = "Injected Content in DIV";
+                          // console.log("Content injected in DIV.");
+          
                         } else {
-                          // অন্য এলিমেন্টে ইনজেক্ট
-                          element.innerHTML = "Injected Content";
-                          console.log("Content injected in element.");
+                          element.innerHTML = "Injected Content in element";
+                          // console.log("Content injected in element.");
                         }
                       } else {
                         console.log("No element found at the specified position.");
@@ -47,6 +60,7 @@ chrome.commands.onCommand.addListener((command) => {
               });
             }
           });
+          
 
         });
       }, 500);
