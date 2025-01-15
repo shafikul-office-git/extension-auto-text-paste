@@ -75,7 +75,7 @@ chrome.commands.onCommand.addListener((command) => {
                             console.log("Cross-origin iframe. Injection failed.");
                           }
                         } else if (element.tagName === "INPUT" || element.tagName === "TEXTAREA") {
-                          element.value = "Auto-filled text";
+                          element.value += content;
                           element.dispatchEvent(new Event('input', {
                             bubbles: true
                           }));
